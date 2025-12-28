@@ -144,7 +144,6 @@
         <div class="steps">
           <article class="step">
             <div class="step-icon" aria-hidden="true">
-              <!-- phone -->
               <svg viewBox="0 0 24 24" fill="none">
                 <path d="M7 3h10a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                 <path d="M9 6h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -157,7 +156,6 @@
 
           <article class="step">
             <div class="step-icon" aria-hidden="true">
-              <!-- missed / bell-off -->
               <svg viewBox="0 0 24 24" fill="none">
                 <path d="M18 8a6 6 0 1 0-12 0c0 7-3 7-3 7h18s-3 0-3-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                 <path d="M13.73 21a2 2 0 0 1-3.46 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -170,7 +168,6 @@
 
           <article class="step">
             <div class="step-icon" aria-hidden="true">
-              <!-- message -->
               <svg viewBox="0 0 24 24" fill="none">
                 <path d="M4 5h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H9l-5 4v-4H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                 <path d="M7 9h10M7 13h7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -239,7 +236,7 @@
             <div class="contact-card">
               <div class="contact-row">
                 <div class="contact-label">Email</div>
-                <a class="contact-value" href="mailto:contact@localpulse.com">contact@localpulse.com</a>
+                <a class="contact-value" href="mailto:contact.localpulse@gmail.com">contact.localpulse@gmail.com</a>
               </div>
               <div class="contact-row">
                 <div class="contact-label">Note</div>
@@ -309,6 +306,99 @@
     </div>
   </footer>
 
-  <script src="./script.js"></script>
+  <script>
+    // Inline override so you don't have to edit script.js just for email changes
+    (function () {
+      const form = document.getElementById('contactForm');
+      const statusEl = document.getElementById('formStatus');
+
+      function setStatus(msg) {
+        if (statusEl) statusEl.textContent = msg || '';
+      }
+      function isValidEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      }
+
+      if (form) {
+        form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          setStatus('');
+
+          const fd = new FormData(form);
+          const name = String(fd.get('name') || '').trim();
+          const business = String(fd.get('business') || '').trim();
+          const email = String(fd.get('email') || '').trim();
+          const message = String(fd.get('message') || '').trim();
+
+          if (!name || !business || !email || !message) {
+            setStatus('Please fill out all fields.');
+            return;
+          }
+          if (!isValidEmail(email)) {
+            setStatus('Please enter a valid email address.');
+            return;
+          }
+
+          const subject = encodeURIComponent('LocalPulse — Get Started');
+          const body = encodeURIComponent(
+            `Name: ${name}\nBusiness: ${business}\nEmail: ${email}\n\nMessage:\n${message}\n\n—\nSent from localpulse.com`
+          );
+
+          window.location.href = `mailto:contact.localpulse@gmail.com?subject=${subject}&body=${body}`;
+          setStatus('Opening your email client…');
+          form.reset();
+        });
+      }
+    })();
+
+    // Keep smooth scroll + nav toggle behavior
+    (function () {
+      const smoothLinks = document.querySelectorAll('a[data-scroll]');
+      smoothLinks.forEach((a) => {
+        a.addEventListener('click', (e) => {
+          const href = a.getAttribute('href') || '';
+          if (!href.startsWith('#')) return;
+          const el = document.querySelector(href);
+          if (!el) return;
+          e.preventDefault();
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          closeNav();
+        });
+      });
+
+      const navToggle = document.querySelector('.nav-toggle');
+      const nav = document.getElementById('site-nav');
+
+      function closeNav() {
+        if (!nav || !navToggle) return;
+        nav.classList.remove('open');
+        navToggle.setAttribute('aria-expanded', 'false');
+      }
+      function openNav() {
+        if (!nav || !navToggle) return;
+        nav.classList.add('open');
+        navToggle.setAttribute('aria-expanded', 'true');
+      }
+
+      if (navToggle && nav) {
+        navToggle.addEventListener('click', () => {
+          const expanded = navToggle.getAttribute('aria-expanded') === 'true';
+          if (expanded) closeNav();
+          else openNav();
+        });
+
+        document.addEventListener('click', (e) => {
+          const t = e.target;
+          if (!t) return;
+          const clickedInside = nav.contains(t) || navToggle.contains(t);
+          if (!clickedInside) closeNav();
+        });
+
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') closeNav();
+        });
+      }
+    })();
+  </script>
 </body>
 </html>
